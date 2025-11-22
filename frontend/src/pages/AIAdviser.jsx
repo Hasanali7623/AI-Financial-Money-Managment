@@ -10,13 +10,9 @@ import {
   Target,
 } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import api from "../services/api";
 
-const genAI = new GoogleGenerativeAI("AIzaSyAu12r5JuVgIdkloI7eL14LiwOkH630nzA");
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
-  systemInstruction:
-    "You are a financial adviser. Give SHORT, CONCISE answers (3-5 sentences max). Be direct and to the point. Only provide essential information without lengthy explanations.",
-});
+const genAI = new GoogleGenerativeAI("AIzaSyBASqH6ZCePXZsWpxZfjskRiK_H8BJOvZQ");
 
 // Quick suggestions for common questions
 const quickSuggestions = [
@@ -52,6 +48,7 @@ export default function AIAdviser() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [financialData, setFinancialData] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -61,6 +58,35 @@ export default function AIAdviser() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Fetch user's financial data
+    const fetchFinancialData = async () => {
+      try {
+        const [transactions, budgets, goals] = await Promise.all([
+          api.get("/transactions"),
+          api.get("/budgets"),
+          api.get("/goals"),
+        ]);
+
+        setFinancialData({
+          transactions: transactions.data.data || [],
+          budgets: budgets.data.data || [],
+          goals: goals.data.data || [],
+        });
+      } catch (error) {
+        console.error("Error fetching financial data:", error);
+        // Set empty data on error so AI can still work
+        setFinancialData({
+          transactions: [],
+          budgets: [],
+          goals: [],
+        });
+      }
+    };
+
+    fetchFinancialData();
+  }, []);
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
@@ -74,7 +100,44 @@ export default function AIAdviser() {
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     try {
-      const result = await model.generateContentStream(message);
+      // Prepare financial context
+      let contextMessage = message;
+      if (financialData) {
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        const monthlyTransactions = financialData.transactions.filter((t) => {
+          const tDate = new Date(t.transactionDate);
+          return (
+            tDate.getMonth() + 1 === currentMonth &&
+            tDate.getFullYear() === currentYear
+          );
+        });
+
+        const totalIncome = monthlyTransactions
+          .filter((t) => t.type === "INCOME")
+          .reduce((sum, t) => sum + t.amount, 0);
+        const totalExpenses = monthlyTransactions
+          .filter((t) => t.type === "EXPENSE")
+          .reduce((sum, t) => sum + t.amount, 0);
+
+        const context = `\n\nUser's Financial Data Context:\n- Total transactions this month: ${
+          monthlyTransactions.length
+        }\n- Total income this month: Rs ${totalIncome.toLocaleString()}\n- Total expenses this month: Rs ${totalExpenses.toLocaleString()}\n- Active budgets: ${
+          financialData.budgets.length
+        }\n- Savings goals: ${
+          financialData.goals.length
+        }\n\nUse this data to provide personalized advice. Answer the user's question directly based on their actual financial data.`;
+
+        contextMessage = message + context;
+      }
+
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction:
+          "You are a financial adviser with access to the user's financial data. Give SHORT, CONCISE answers (3-5 sentences max). Be direct and to the point. Use the provided financial data to give personalized advice. Only provide essential information without lengthy explanations.",
+      });
+
+      const result = await model.generateContentStream(contextMessage);
       let fullText = "";
 
       for await (const chunk of result.stream) {
