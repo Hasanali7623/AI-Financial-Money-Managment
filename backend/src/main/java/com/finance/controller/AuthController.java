@@ -1,5 +1,6 @@
 package com.finance.controller;
 
+import com.finance.dto.request.ChangePasswordRequest;
 import com.finance.dto.request.LoginRequest;
 import com.finance.dto.request.RefreshTokenRequest;
 import com.finance.dto.request.RegisterRequest;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,5 +44,23 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         AuthResponse response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
+    }
+
+    @PutMapping("/change-password")
+    @Operation(summary = "Change user password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+        String email = authentication.getName();
+        authService.changePassword(email, request);
+        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+    }
+
+    @DeleteMapping("/account")
+    @Operation(summary = "Delete user account")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(Authentication authentication) {
+        String email = authentication.getName();
+        authService.deleteAccount(email);
+        return ResponseEntity.ok(ApiResponse.success("Account deleted successfully", null));
     }
 }

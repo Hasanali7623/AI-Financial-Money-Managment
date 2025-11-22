@@ -1,11 +1,16 @@
 package com.finance.service;
 
+import com.finance.dto.request.ChangePasswordRequest;
 import com.finance.dto.request.LoginRequest;
 import com.finance.dto.request.RegisterRequest;
 import com.finance.dto.response.AuthResponse;
 import com.finance.dto.response.UserResponse;
 import com.finance.entity.User;
 import com.finance.exception.ResourceAlreadyExistsException;
+import com.finance.exception.ResourceNotFoundException;
+import com.finance.repository.BudgetRepository;
+import com.finance.repository.SavingsGoalRepository;
+import com.finance.repository.TransactionRepository;
 import com.finance.repository.UserRepository;
 import com.finance.security.CustomUserDetailsService;
 import com.finance.security.JwtTokenProvider;
@@ -26,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
+    private final BudgetRepository budgetRepository;
+    private final SavingsGoalRepository savingsGoalRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -105,6 +113,49 @@ public class AuthService {
                 .expiresIn(jwtExpiration)
                 .user(mapToUserResponse(user))
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Update to new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        log.info("Password changed for user: {}", user.getEmail());
+    }
+
+    @Transactional
+    public void deleteAccount(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        // Delete all user-related data first to avoid foreign key constraint violations
+        Long userId = user.getId();
+        
+        log.info("Deleting all data for user: {}", email);
+        
+        // Delete transactions
+        transactionRepository.deleteByUserId(userId);
+        log.info("Deleted transactions for user: {}", email);
+        
+        // Delete budgets
+        budgetRepository.deleteByUserId(userId);
+        log.info("Deleted budgets for user: {}", email);
+        
+        // Delete savings goals
+        savingsGoalRepository.deleteByUserId(userId);
+        log.info("Deleted savings goals for user: {}", email);
+        
+        // Finally delete the user account
+        userRepository.delete(user);
+        log.info("Account deleted for user: {}", email);
     }
 
     private UserResponse mapToUserResponse(User user) {

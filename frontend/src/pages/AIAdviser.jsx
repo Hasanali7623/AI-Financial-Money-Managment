@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Sparkles, Send, Loader2, Brain } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Sparkles,
+  Send,
+  Loader2,
+  Brain,
+  TrendingUp,
+  DollarSign,
+  PiggyBank,
+  Target,
+} from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI("AIzaSyAu12r5JuVgIdkloI7eL14LiwOkH630nzA");
@@ -8,6 +17,30 @@ const model = genAI.getGenerativeModel({
   systemInstruction:
     "You are a financial adviser. Give SHORT, CONCISE answers (3-5 sentences max). Be direct and to the point. Only provide essential information without lengthy explanations.",
 });
+
+// Quick suggestions for common questions
+const quickSuggestions = [
+  {
+    icon: DollarSign,
+    text: "How to save money?",
+    gradient: "from-green-400 to-emerald-600",
+  },
+  {
+    icon: TrendingUp,
+    text: "Investment tips for beginners",
+    gradient: "from-blue-400 to-indigo-600",
+  },
+  {
+    icon: PiggyBank,
+    text: "Best budgeting strategies",
+    gradient: "from-purple-400 to-pink-600",
+  },
+  {
+    icon: Target,
+    text: "How to set financial goals?",
+    gradient: "from-orange-400 to-red-600",
+  },
+];
 
 export default function AIAdviser() {
   const [messages, setMessages] = useState([
@@ -19,6 +52,15 @@ export default function AIAdviser() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
@@ -74,44 +116,79 @@ export default function AIAdviser() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
-            <Brain className="h-6 w-6 text-white" />
+    <div className="max-w-6xl mx-auto">
+      {/* Header with animated gradient */}
+      <div className="relative mb-6 p-8 rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="bg-white/20 backdrop-blur-lg p-4 rounded-2xl shadow-2xl">
+              <Brain className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                AI Financial Adviser
+              </h1>
+              <p className="text-blue-100 mt-1 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Powered by Google Gemini AI
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            AI Financial Adviser
-          </h1>
         </div>
-        <p className="text-gray-600 dark:text-gray-400 ml-16">
-          Get instant financial advice powered by Google Gemini AI
-        </p>
       </div>
 
+      {/* Quick Suggestions */}
+      {messages.length === 1 && (
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Quick Questions:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {quickSuggestions.map((suggestion, idx) => {
+              const Icon = suggestion.icon;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => sendMessage(suggestion.text)}
+                  className={`group flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r ${suggestion.gradient} text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
+                >
+                  <div className="bg-white/20 p-2 rounded-lg">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-sm font-medium">{suggestion.text}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Chat Container */}
-      <div className="card mb-4 h-[600px] flex flex-col">
+      <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 mb-4 h-[600px] flex flex-col overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`flex ${
+              className={`flex animate-fade-in ${
                 msg.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[85%] rounded-3xl px-5 py-4 shadow-lg transform transition-all duration-300 hover:scale-[1.02] ${
                   msg.role === "user"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    ? "bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 text-white shadow-blue-500/50"
+                    : "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 shadow-gray-300/50 dark:shadow-gray-900/50"
                 }`}
               >
                 {msg.role === "assistant" && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      AI Adviser
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200 dark:border-gray-600">
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-1.5 rounded-lg">
+                      <Sparkles className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      AI Financial Adviser
                     </span>
                   </div>
                 )}
@@ -148,37 +225,41 @@ export default function AIAdviser() {
             </div>
           ))}
           {loading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                  <span className="text-gray-600 dark:text-gray-400">
+            <div className="flex justify-start animate-fade-in">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl px-6 py-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-75"></div>
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400 relative" />
+                  </div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
                     AI is thinking...
                   </span>
                 </div>
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Form */}
         <form
           onSubmit={handleSubmit}
-          className="border-t border-gray-200 dark:border-gray-700 p-4"
+          className="border-t-2 border-gradient-to-r from-blue-500 to-purple-500 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-gray-800/50 dark:to-gray-700/50 backdrop-blur-sm p-5"
         >
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything about finance..."
-              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="flex-1 px-5 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-inner transition-all duration-300"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="btn-primary px-6 py-3 rounded-xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-2xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
             >
               <Send className="h-5 w-5" />
               <span className="hidden sm:inline">Send</span>

@@ -34,4 +34,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     
     List<Transaction> findByUserIdAndIsRecurringTrueAndNextDueDateBetween(
             Long userId, LocalDate startDate, LocalDate endDate);
+    
+    void deleteByUserId(Long userId);
 }
