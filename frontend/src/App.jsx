@@ -17,6 +17,7 @@ import CurrencyConverter from "./pages/CurrencyConverter";
 import Profile from "./pages/Profile";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
+import AuthDemo from "./pages/AuthDemo";
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -37,6 +38,9 @@ function App() {
           path="/register"
           element={user ? <Navigate to="/dashboard" /> : <Register />}
         />
+
+        {/* Auth Demo Page - accessible without login for showcase */}
+        <Route path="/auth-demo" element={<AuthDemo />} />
 
         <Route
           path="/"

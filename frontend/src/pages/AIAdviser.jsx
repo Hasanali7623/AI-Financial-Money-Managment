@@ -12,7 +12,7 @@ import {
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import api from "../services/api";
 
-const genAI = new GoogleGenerativeAI("AIzaSyBASqH6ZCePXZsWpxZfjskRiK_H8BJOvZQ");
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
 
 // Quick suggestions for common questions
 const quickSuggestions = [
@@ -180,19 +180,18 @@ export default function AIAdviser() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header with animated gradient */}
-      <div className="relative mb-6 p-8 rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="bg-white/20 backdrop-blur-lg p-4 rounded-2xl shadow-2xl">
-              <Brain className="h-8 w-8 text-white" />
+      {/* Header */}
+      <div className="page-hero mb-6">
+        <div>
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4 mb-3">
+            <div className="bg-gray-100 dark:bg-gray-800 p-3 sm:p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-gray-700 dark:text-gray-200" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">
                 AI Financial Adviser
               </h1>
-              <p className="text-blue-100 mt-1 flex items-center gap-2">
+              <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 Powered by Google Gemini AI
               </p>
@@ -228,9 +227,9 @@ export default function AIAdviser() {
       )}
 
       {/* Chat Container */}
-      <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 mb-4 h-[600px] flex flex-col overflow-hidden">
+      <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 mb-4 h-[75vh] sm:h-[600px] min-h-[460px] flex flex-col overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -239,7 +238,7 @@ export default function AIAdviser() {
               }`}
             >
               <div
-                className={`max-w-[85%] rounded-3xl px-5 py-4 shadow-lg transform transition-all duration-300 hover:scale-[1.02] ${
+                className={`max-w-[92%] sm:max-w-[85%] rounded-3xl px-4 sm:px-5 py-3 sm:py-4 shadow-lg transform transition-all duration-300 hover:scale-[1.02] ${
                   msg.role === "user"
                     ? "bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 text-white shadow-blue-500/50"
                     : "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100 shadow-gray-300/50 dark:shadow-gray-900/50"
@@ -272,7 +271,7 @@ export default function AIAdviser() {
                     // Handle bold text **text**
                     const boldText = trimmedLine.replace(
                       /\*\*(.+?)\*\*/g,
-                      "<strong>$1</strong>"
+                      "<strong>$1</strong>",
                     );
 
                     return (
@@ -310,19 +309,19 @@ export default function AIAdviser() {
           onSubmit={handleSubmit}
           className="border-t-2 border-gradient-to-r from-blue-500 to-purple-500 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-gray-800/50 dark:to-gray-700/50 backdrop-blur-sm p-5"
         >
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything about finance..."
-              className="flex-1 px-5 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-inner transition-all duration-300"
+              className="flex-1 px-4 sm:px-5 py-3 sm:py-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-inner transition-all duration-300"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-2xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+              className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
             >
               <Send className="h-5 w-5" />
               <span className="hidden sm:inline">Send</span>

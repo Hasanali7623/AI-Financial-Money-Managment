@@ -12,7 +12,6 @@ import {
   ArrowDownCircle,
   Calendar,
   DollarSign,
-  Search,
   X,
   SlidersHorizontal,
 } from "lucide-react";
@@ -24,7 +23,6 @@ export default function Transactions() {
   const [showModal, setShowModal] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [filter, setFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -193,6 +191,23 @@ export default function Transactions() {
     filters.maxAmount ||
     searchQuery;
 
+  const summary = filteredTransactions.reduce(
+    (acc, transaction) => {
+      const amount = Number(transaction.amount) || 0;
+      if (transaction.type === "INCOME") {
+        acc.income += amount;
+        acc.incomeCount += 1;
+      } else {
+        acc.expense += amount;
+        acc.expenseCount += 1;
+      }
+      return acc;
+    },
+    { income: 0, expense: 0, incomeCount: 0, expenseCount: 0 },
+  );
+
+  const net = summary.income - summary.expense;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -203,190 +218,223 @@ export default function Transactions() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl p-8 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-white">
-            <h1 className="text-4xl font-bold mb-2 flex items-center">
-              <DollarSign className="h-10 w-10 mr-3" />
-              Transactions
-            </h1>
-            <p className="text-blue-100 text-lg">
-              Track and manage all your financial activities
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 shadow-lg backdrop-blur-sm">
+        <div className="p-5 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                Transactions
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+                Track, filter, and manage your financial activity
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-4 py-2.5 font-semibold transition hover:opacity-90"
+              >
+                <Plus className="h-5 w-5" />
+                Add Transaction
+              </button>
+              <button
+                onClick={() => setShowUpload(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              >
+                <Upload className="h-5 w-5" />
+                Upload Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-5 sm:p-6">
+          <div className="rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-4">
+            <p className="text-xs uppercase tracking-wide text-green-700 dark:text-green-300 font-semibold">
+              Total Income
+            </p>
+            <p className="mt-2 text-2xl font-bold text-green-700 dark:text-green-300">
+              ₹{summary.income.toLocaleString()}
+            </p>
+            <p className="text-xs mt-1 text-green-700/80 dark:text-green-300/80">
+              {summary.incomeCount} entries
             </p>
           </div>
-          <div className="flex space-x-3 mt-4 sm:mt-0">
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold flex items-center shadow-lg transition-all hover:scale-105"
+
+          <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
+            <p className="text-xs uppercase tracking-wide text-red-700 dark:text-red-300 font-semibold">
+              Total Expenses
+            </p>
+            <p className="mt-2 text-2xl font-bold text-red-700 dark:text-red-300">
+              ₹{summary.expense.toLocaleString()}
+            </p>
+            <p className="text-xs mt-1 text-red-700/80 dark:text-red-300/80">
+              {summary.expenseCount} entries
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+            <p className="text-xs uppercase tracking-wide text-blue-700 dark:text-blue-300 font-semibold">
+              Net Balance
+            </p>
+            <p
+              className={`mt-2 text-2xl font-bold ${
+                net >= 0
+                  ? "text-blue-700 dark:text-blue-300"
+                  : "text-red-700 dark:text-red-300"
+              }`}
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Add Transaction
-            </button>
-            <button
-              onClick={() => setShowUpload(true)}
-              className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold flex items-center shadow-lg transition-all hover:scale-105"
-            >
-              <Upload className="h-5 w-5 mr-2" />
-              Upload Receipt
-            </button>
+              ₹{net.toLocaleString()}
+            </p>
+            <p className="text-xs mt-1 text-blue-700/80 dark:text-blue-300/80">
+              {filteredTransactions.length} filtered transactions
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Search & Filter */}
-      <div className="space-y-4">
-        <div className="card bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="bg-purple-100 dark:bg-purple-800 p-3 rounded-xl">
-              <Filter className="h-5 w-5 text-purple-600 dark:text-purple-300" />
-            </div>
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md p-4 sm:p-5">
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between mb-4">
+          <div className="relative flex-1">
             <input
               type="text"
-              placeholder="🔍 Search by category, description, or merchant..."
+              placeholder="Search by category, description, or merchant"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-field flex-1 text-lg"
+              className="input-field w-full pl-11"
             />
+            <DollarSign className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             >
-              <Filter className="h-4 w-4" />
-              <span>{showFilters ? "Hide Filters" : "Advanced Filters"}</span>
+              <SlidersHorizontal className="h-4 w-4" />
+              {showFilters ? "Hide Filters" : "Advanced Filters"}
             </button>
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="flex items-center space-x-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-300 dark:border-red-800 px-4 py-2.5 font-medium text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
               >
                 <X className="h-4 w-4" />
-                <span>Clear Filters</span>
+                Clear
               </button>
             )}
           </div>
-
-          {showFilters && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl border-2 border-purple-200 dark:border-purple-700">
-              {/* Type Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Transaction Type
-                </label>
-                <select
-                  value={filters.type}
-                  onChange={(e) =>
-                    setFilters({ ...filters, type: e.target.value })
-                  }
-                  className="input-field w-full"
-                >
-                  <option value="">All Types</option>
-                  <option value="INCOME">Income</option>
-                  <option value="EXPENSE">Expense</option>
-                </select>
-              </div>
-
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Food, Transport"
-                  value={filters.category}
-                  onChange={(e) =>
-                    setFilters({ ...filters, category: e.target.value })
-                  }
-                  className="input-field w-full"
-                />
-              </div>
-
-              {/* Start Date Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) =>
-                    setFilters({ ...filters, startDate: e.target.value })
-                  }
-                  className="input-field w-full"
-                />
-              </div>
-
-              {/* End Date Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) =>
-                    setFilters({ ...filters, endDate: e.target.value })
-                  }
-                  className="input-field w-full"
-                />
-              </div>
-
-              {/* Min Amount Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Min Amount
-                </label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={filters.minAmount}
-                  onChange={(e) =>
-                    setFilters({ ...filters, minAmount: e.target.value })
-                  }
-                  className="input-field w-full"
-                />
-              </div>
-
-              {/* Max Amount Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Max Amount
-                </label>
-                <input
-                  type="number"
-                  placeholder="10000.00"
-                  value={filters.maxAmount}
-                  onChange={(e) =>
-                    setFilters({ ...filters, maxAmount: e.target.value })
-                  }
-                  className="input-field w-full"
-                />
-              </div>
-            </div>
-          )}
         </div>
+
+        {showFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/50">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Transaction Type
+              </label>
+              <select
+                value={filters.type}
+                onChange={(e) =>
+                  setFilters({ ...filters, type: e.target.value })
+                }
+                className="input-field w-full"
+              >
+                <option value="">All Types</option>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Category
+              </label>
+              <input
+                type="text"
+                placeholder="e.g., Food, Transport"
+                value={filters.category}
+                onChange={(e) =>
+                  setFilters({ ...filters, category: e.target.value })
+                }
+                className="input-field w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) =>
+                  setFilters({ ...filters, startDate: e.target.value })
+                }
+                className="input-field w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                End Date
+              </label>
+              <input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) =>
+                  setFilters({ ...filters, endDate: e.target.value })
+                }
+                className="input-field w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Min Amount
+              </label>
+              <input
+                type="number"
+                placeholder="0.00"
+                value={filters.minAmount}
+                onChange={(e) =>
+                  setFilters({ ...filters, minAmount: e.target.value })
+                }
+                className="input-field w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Max Amount
+              </label>
+              <input
+                type="number"
+                placeholder="10000.00"
+                value={filters.maxAmount}
+                onChange={(e) =>
+                  setFilters({ ...filters, maxAmount: e.target.value })
+                }
+                className="input-field w-full"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Beautiful Transaction Cards */}
       <div className="space-y-4">
         {filteredTransactions.map((transaction) => (
           <div
             key={transaction.id}
-            className={`card hover:shadow-xl transition-all duration-300 hover:scale-[1.02] ${
+            className={`rounded-xl border p-4 sm:p-5 transition-all duration-200 hover:shadow-md ${
               transaction.type === "INCOME"
-                ? "border-l-4 border-green-500 bg-gradient-to-r from-green-50 to-white dark:from-green-900/20 dark:to-gray-900"
-                : "border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-gray-900"
+                ? "border-green-200 bg-green-50/70 dark:border-green-800 dark:bg-green-900/10"
+                : "border-red-200 bg-red-50/70 dark:border-red-800 dark:bg-red-900/10"
             }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 flex-1">
-                {/* Icon */}
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 <div
-                  className={`p-4 rounded-2xl ${
+                  className={`p-3 rounded-xl ${
                     transaction.type === "INCOME"
                       ? "bg-green-100 dark:bg-green-900"
                       : "bg-red-100 dark:bg-red-900"
@@ -399,38 +447,36 @@ export default function Transactions() {
                   )}
                 </div>
 
-                {/* Transaction Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 break-words">
                       {transaction.description || transaction.category}
                     </h3>
-                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900">
                       {transaction.category}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
                       {format(
                         new Date(transaction.transactionDate),
-                        "MMM dd, yyyy"
+                        "MMM dd, yyyy",
                       )}
                     </div>
                     {transaction.merchant && (
                       <div className="flex items-center">
                         <span className="font-medium">
-                          🏪 {transaction.merchant}
+                          {transaction.merchant}
                         </span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Amount */}
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <div
-                    className={`text-3xl font-bold ${
+                    className={`text-xl sm:text-2xl lg:text-3xl font-bold ${
                       transaction.type === "INCOME"
                         ? "text-green-600 dark:text-green-400"
                         : "text-red-600 dark:text-red-400"
@@ -445,18 +491,17 @@ export default function Transactions() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex space-x-2 ml-4">
+              <div className="flex gap-2 lg:ml-4 self-end lg:self-auto">
                 <button
                   onClick={() => handleEdit(transaction)}
-                  className="p-3 rounded-xl bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 transition-colors"
+                  className="p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                   title="Edit"
                 >
                   <Edit className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => handleDelete(transaction.id)}
-                  className="p-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 transition-colors"
+                  className="p-2.5 rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
                   title="Delete"
                 >
                   <Trash2 className="h-5 w-5" />
@@ -467,7 +512,7 @@ export default function Transactions() {
         ))}
 
         {filteredTransactions.length === 0 && (
-          <div className="card text-center py-16">
+          <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-center py-16 bg-white dark:bg-gray-900">
             <DollarSign className="h-20 w-20 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
             <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
               No transactions found
@@ -486,7 +531,7 @@ export default function Transactions() {
         title={editingTransaction ? "Edit Transaction" : "Add Transaction"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Type
@@ -519,7 +564,7 @@ export default function Transactions() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Category
@@ -631,7 +676,7 @@ export default function Transactions() {
             )}
           </div>
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
             <button
               type="button"
               onClick={handleCloseModal}

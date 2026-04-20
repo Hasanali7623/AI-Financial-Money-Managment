@@ -22,7 +22,7 @@ export default function CurrencyConverter() {
       const response = await analyticsService.convertCurrency(
         parseFloat(amount),
         fromCurrency,
-        toCurrency
+        toCurrency,
       );
       setResult(response);
     } catch (error) {
@@ -41,13 +41,15 @@ export default function CurrencyConverter() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-2xl p-8 shadow-xl text-white text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4 animate-pulse">
-          <ArrowRightLeft className="h-10 w-10 text-white" />
+      {/* Header */}
+      <div className="page-hero text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <ArrowRightLeft className="h-8 w-8 text-gray-700 dark:text-gray-300" />
         </div>
-        <h1 className="text-4xl font-bold mb-2">💱 Currency Converter</h1>
-        <p className="text-green-100 text-lg">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+          💱 Currency Converter
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Real-time exchange rates for instant currency conversion
         </p>
       </div>
@@ -93,9 +95,9 @@ export default function CurrencyConverter() {
             <button
               type="button"
               onClick={swapCurrencies}
-              className="p-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-full transition-all hover:scale-110 hover:rotate-180 shadow-lg"
+              className="p-4 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110 hover:rotate-180 shadow-sm"
             >
-              <ArrowRightLeft className="h-6 w-6 text-white" />
+              <ArrowRightLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             </button>
           </div>
 

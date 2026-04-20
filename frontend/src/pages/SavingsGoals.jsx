@@ -70,7 +70,7 @@ export default function SavingsGoals() {
       console.error("Error saving goal:", error);
       alert(
         error.response?.data?.message ||
-          "Failed to save goal. Please check all fields."
+          "Failed to save goal. Please check all fields.",
       );
     }
   };
@@ -120,7 +120,7 @@ export default function SavingsGoals() {
       console.error("Error adding contribution:", error);
       alert(
         error.response?.data?.message ||
-          "Failed to add contribution. Please try again."
+          "Failed to add contribution. Please try again.",
       );
     }
   };
@@ -155,21 +155,21 @@ export default function SavingsGoals() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl p-8 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="text-white">
-            <h1 className="text-4xl font-bold mb-2 flex items-center">
-              <Trophy className="h-10 w-10 mr-3" />
+      {/* Header */}
+      <div className="page-hero">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center text-gray-900 dark:text-gray-100">
+              <Trophy className="h-7 w-7 sm:h-8 sm:w-8 mr-3 text-gray-700 dark:text-gray-300" />
               Savings Goals
             </h1>
-            <p className="text-emerald-100 text-lg">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               ✨ Achieve your dreams with smart savings tracking
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-white text-emerald-600 hover:bg-emerald-50 px-6 py-3 rounded-xl font-semibold flex items-center shadow-lg transition-all hover:scale-105"
+            className="btn-primary w-full sm:w-auto"
           >
             <Plus className="h-5 w-5 mr-2" />
             Add Goal
@@ -188,10 +188,10 @@ export default function SavingsGoals() {
           return (
             <div
               key={goal.id}
-              className={`card hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden ${
+              className={`rounded-lg p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden shadow-lg border-2 ${
                 isAchieved
-                  ? "bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-900/30 dark:via-amber-900/30 dark:to-orange-900/30 border-yellow-400 dark:border-yellow-600"
-                  : "bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 border-cyan-300 dark:border-cyan-700"
+                  ? "bg-gradient-to-br from-yellow-100 via-amber-100 to-orange-100 dark:from-yellow-900/30 dark:via-amber-900/30 dark:to-orange-900/30 border-yellow-500 dark:border-yellow-600"
+                  : "bg-gradient-to-br from-cyan-100 via-blue-100 to-indigo-100 dark:from-cyan-900/30 dark:to-blue-900/30 border-cyan-500 dark:border-cyan-700"
               }`}
             >
               {/* Achievement Badge */}
@@ -330,7 +330,7 @@ export default function SavingsGoals() {
               </div>
 
               {/* Deadline */}
-              <div className="bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40 rounded-xl p-3 mb-4">
+              <div className="bg-gradient-to-r from-blue-200 to-cyan-200 dark:from-blue-900/40 dark:to-cyan-900/40 rounded-xl p-3 mb-4 border border-blue-300 dark:border-blue-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -374,8 +374,8 @@ export default function SavingsGoals() {
       </div>
 
       {goals.length === 0 && (
-        <div className="card text-center py-16 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20">
-          <Trophy className="h-24 w-24 mx-auto text-cyan-300 dark:text-cyan-600 mb-6" />
+        <div className="rounded-lg p-6 text-center py-16 bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900/20 dark:to-blue-900/20 border-2 border-cyan-300 dark:border-cyan-700 shadow-lg">
+          <Trophy className="h-24 w-24 mx-auto text-cyan-500 dark:text-cyan-600 mb-6" />
           <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
             No Savings Goals Yet
           </h3>

@@ -104,7 +104,7 @@ export default function Profile() {
       link.href = url;
       link.setAttribute(
         "download",
-        `financial-data-${new Date().toISOString().split("T")[0]}.json`
+        `financial-data-${new Date().toISOString().split("T")[0]}.json`,
       );
       document.body.appendChild(link);
       link.click();
@@ -136,26 +136,26 @@ export default function Profile() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-2xl p-8 shadow-xl text-white">
+      {/* Header */}
+      <div className="page-hero">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-              <User className="h-10 w-10" />
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+              <User className="h-8 w-8 sm:h-10 sm:w-10 text-gray-700 dark:text-gray-300" />
               My Profile
             </h1>
-            <p className="text-blue-100 text-lg">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Manage your account settings and preferences
             </p>
           </div>
           <div className="hidden md:block">
-            <Settings className="h-16 w-16 opacity-50" />
+            <Settings className="h-14 w-14 text-gray-300 dark:text-gray-600" />
           </div>
         </div>
       </div>
 
       {/* Profile Info Card */}
-      <div className="card bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
+      <div className="card">
         <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full blur-xl opacity-50"></div>

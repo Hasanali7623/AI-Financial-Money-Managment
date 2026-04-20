@@ -20,6 +20,10 @@ import {
   Calendar,
   ArrowRight,
   Clock,
+  RefreshCw,
+  Gauge,
+  AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import {
   PieChart,
@@ -59,6 +63,29 @@ export default function Dashboard() {
     loadData();
   }, []);
 
+  const totalIncome = summary?.totalIncome || 0;
+  const totalExpenses = summary?.totalExpenses || 0;
+  const netSavings = totalIncome - totalExpenses;
+  const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
+  const expenseToIncome =
+    totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+  const topCategory = categoryData.length > 0 ? categoryData[0] : null;
+  const totalBudgetItems = topBudgets.length;
+  const overBudgetItems = topBudgets.filter(
+    (budget) => ((budget.spentAmount || 0) / budget.amount) * 100 >= 100,
+  ).length;
+  const budgetHealth =
+    totalBudgetItems > 0
+      ? Math.max(
+          0,
+          ((totalBudgetItems - overBudgetItems) / totalBudgetItems) * 100,
+        )
+      : 100;
+  const healthScore = Math.min(
+    100,
+    Math.max(0, Math.round(savingsRate * 1.8 + budgetHealth * 0.5)),
+  );
+
   const loadData = async () => {
     try {
       const [summaryData, categorySpending, trends, transactions, budgets] =
@@ -92,13 +119,95 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Welcome back! Here's your financial overview
-        </p>
+      <div className="page-hero">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Dashboard
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+              Welcome back! Here's your financial overview
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Updated {new Date().toLocaleString()}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full lg:w-auto">
+            <button
+              onClick={loadData}
+              className="btn-secondary w-full sm:w-auto"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+            <button
+              onClick={() => navigate("/analytics")}
+              className="btn-primary w-full sm:w-auto"
+            >
+              <Sparkles className="h-4 w-4" />
+              View Insights
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold">
+              Savings Rate
+            </p>
+            <p
+              className={`text-2xl font-bold mt-2 ${
+                savingsRate >= 20
+                  ? "text-green-600 dark:text-green-400"
+                  : savingsRate >= 0
+                    ? "text-yellow-600 dark:text-yellow-400"
+                    : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              {savingsRate.toFixed(1)}%
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Net savings divided by income
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+            <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold">
+              Expense Ratio
+            </p>
+            <p className="text-2xl font-bold mt-2 text-gray-900 dark:text-gray-100">
+              {expenseToIncome.toFixed(1)}%
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Share of income currently spent
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold">
+                Financial Health
+              </p>
+              <Gauge className="h-4 w-4 text-gray-500 dark:text-gray-300" />
+            </div>
+            <p className="text-2xl font-bold mt-2 text-gray-900 dark:text-gray-100">
+              {healthScore}/100
+            </p>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2 overflow-hidden">
+              <div
+                className={`h-2 rounded-full ${
+                  healthScore >= 70
+                    ? "bg-green-600"
+                    : healthScore >= 45
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                }`}
+                style={{ width: `${healthScore}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -128,7 +237,7 @@ export default function Dashboard() {
           title="Savings Goals"
           value={`${summary?.savingsGoalsCount || 0}`}
           icon={Target}
-          color="purple"
+          color="black"
           trend={`${summary?.achievedGoals || 0} achieved`}
         />
       </div>
@@ -136,7 +245,7 @@ export default function Dashboard() {
       {/* Financial Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Income vs Expenses Comparison */}
-        <div className="card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+        <div className="rounded-lg shadow-md p-6 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Income Overview
@@ -151,7 +260,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="card bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-800">
+        <div className="rounded-lg shadow-md p-6 bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-300 dark:border-red-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Expenses Overview
@@ -166,7 +275,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+        <div className="rounded-lg shadow-md p-6 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Net Savings
@@ -174,15 +283,79 @@ export default function Dashboard() {
             <Activity className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-            ₹
-            {(
-              (summary?.totalIncome || 0) - (summary?.totalExpenses || 0)
-            ).toLocaleString()}
+            ₹{netSavings.toLocaleString()}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {summary?.totalIncome > summary?.totalExpenses
+            {totalIncome > totalExpenses
               ? "Positive cash flow"
               : "Negative cash flow"}
+          </p>
+        </div>
+      </div>
+
+      {/* Insights Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              Top Spending Category
+            </h3>
+            <Wallet className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          </div>
+          {topCategory ? (
+            <>
+              <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {topCategory.name}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                ₹{topCategory.value.toLocaleString()} spent in this category
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Add more transactions to see category insights.
+            </p>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              Budget Compliance
+            </h3>
+            {overBudgetItems > 0 ? (
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            ) : (
+              <Target className="h-4 w-4 text-green-600" />
+            )}
+          </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            {Math.round(budgetHealth)}%
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {overBudgetItems} of {totalBudgetItems} tracked budgets over limit
+          </p>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              Cash Position
+            </h3>
+            <Activity className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          </div>
+          <p
+            className={`text-xl font-bold ${
+              netSavings >= 0
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-600 dark:text-red-400"
+            }`}
+          >
+            ₹{Math.abs(netSavings).toLocaleString()}{" "}
+            {netSavings >= 0 ? "surplus" : "deficit"}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Based on current period income and expenses
           </p>
         </div>
       </div>
@@ -267,14 +440,14 @@ export default function Dashboard() {
                         name: "Total Income",
                         value: monthlyData.reduce(
                           (sum, m) => sum + m.income,
-                          0
+                          0,
                         ),
                       },
                       {
                         name: "Total Expenses",
                         value: monthlyData.reduce(
                           (sum, m) => sum + m.expenses,
-                          0
+                          0,
                         ),
                       },
                     ]}
@@ -344,12 +517,12 @@ export default function Dashboard() {
         <div className="card">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-purple-600" />
+              <Clock className="h-5 w-5 text-black dark:text-white" />
               Recent Transactions
             </h2>
             <button
               onClick={() => navigate("/transactions")}
-              className="text-sm text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
+              className="text-sm text-black dark:text-white hover:underline flex items-center gap-1"
             >
               View All
               <ArrowRight className="h-4 w-4" />
@@ -383,7 +556,7 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {transaction.category} •{" "}
                         {new Date(
-                          transaction.transactionDate
+                          transaction.transactionDate,
                         ).toLocaleDateString()}
                       </p>
                     </div>
@@ -407,7 +580,7 @@ export default function Dashboard() {
               <p>No transactions yet</p>
               <button
                 onClick={() => navigate("/transactions")}
-                className="mt-4 text-purple-600 dark:text-purple-400 hover:underline"
+                className="mt-4 text-black dark:text-white hover:underline"
               >
                 Add your first transaction
               </button>
@@ -454,8 +627,8 @@ export default function Dashboard() {
                           isOver
                             ? "bg-red-600"
                             : isWarning
-                            ? "bg-yellow-600"
-                            : "bg-green-600"
+                              ? "bg-yellow-600"
+                              : "bg-green-600"
                         }`}
                         style={{ width: `${Math.min(percentage, 100)}%` }}
                       />
@@ -466,8 +639,8 @@ export default function Dashboard() {
                           isOver
                             ? "text-red-600 dark:text-red-400"
                             : isWarning
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : "text-green-600 dark:text-green-400"
+                              ? "text-yellow-600 dark:text-yellow-400"
+                              : "text-green-600 dark:text-green-400"
                         }`}
                       >
                         {percentage.toFixed(1)}% used
@@ -500,17 +673,17 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="card bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-800">
+      <div className="rounded-lg shadow-md p-6 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-900/20 dark:to-gray-800/20 border-2 border-gray-300 dark:border-gray-800">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
-          <Activity className="h-5 w-5 text-purple-600" />
+          <Activity className="h-5 w-5 text-black dark:text-white" />
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button
             onClick={() => navigate("/transactions")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl border-2 border-purple-200 dark:border-purple-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all hover:scale-105 hover:shadow-xl"
+            className="group p-6 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-black dark:hover:border-white transition-all hover:scale-105 hover:shadow-xl"
           >
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
+            <div className="bg-gradient-to-r from-gray-800 to-black p-3 rounded-xl w-fit mb-3 group-hover:scale-110 transition-transform">
               <Plus className="h-6 w-6 text-white" />
             </div>
             <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-1">

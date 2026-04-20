@@ -109,15 +109,15 @@ export default function Analytics() {
   const calculateMetrics = () => {
     const totalIncome = filteredTrendData.reduce(
       (sum, t) => sum + (t.income || 0),
-      0
+      0,
     );
     const totalExpenses = filteredTrendData.reduce(
       (sum, t) => sum + (t.expense || 0),
-      0
+      0,
     );
     const totalTransactions = filteredTrendData.reduce(
       (sum, t) => sum + (t.count || 0),
-      0
+      0,
     );
 
     let daysInPeriod = 30; // default for month
@@ -175,20 +175,20 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-2xl p-8 shadow-xl text-white">
-        <div className="flex items-center justify-between">
+      <div className="page-hero">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-              <BarChart3 className="h-10 w-10" />
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+              <BarChart3 className="h-8 w-8 text-gray-700 dark:text-gray-300" />
               Advanced Analytics
             </h1>
-            <p className="text-purple-100 text-lg">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Deep insights into your financial patterns and trends
             </p>
           </div>
           <button
             onClick={exportData}
-            className="hidden md:flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-xl transition-all hover:scale-105"
+            className="hidden md:inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           >
             <Download className="h-5 w-5" />
             Export Data
@@ -204,8 +204,8 @@ export default function Analytics() {
             onClick={() => setTimeRange(range)}
             className={`px-6 py-3 rounded-xl font-semibold transition-all ${
               timeRange === range
-                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                ? "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 shadow-md"
+                : "bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
             {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -500,7 +500,7 @@ export default function Analytics() {
                       (max.income || 0) - (max.expense || 0)
                         ? item
                         : max,
-                    filteredTrendData[0]
+                    filteredTrendData[0],
                   ).month
                 : "N/A"}
             </p>
@@ -510,8 +510,8 @@ export default function Analytics() {
                 ? Math.max(
                     0,
                     ...filteredTrendData.map(
-                      (t) => (t.income || 0) - (t.expense || 0)
-                    )
+                      (t) => (t.income || 0) - (t.expense || 0),
+                    ),
                   ).toLocaleString()
                 : "0"}
             </p>
@@ -522,8 +522,8 @@ export default function Analytics() {
               {timeRange === "week"
                 ? "Weekly"
                 : timeRange === "month"
-                ? "Monthly"
-                : "Yearly"}{" "}
+                  ? "Monthly"
+                  : "Yearly"}{" "}
               Spending
             </p>
             <p className="text-lg font-bold text-blue-600">
@@ -531,8 +531,8 @@ export default function Analytics() {
               {timeRange === "week"
                 ? "Week(s)"
                 : timeRange === "month"
-                ? "Month(s)"
-                : "Year(s)"}
+                  ? "Month(s)"
+                  : "Year(s)"}
             </p>
             <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               ₹

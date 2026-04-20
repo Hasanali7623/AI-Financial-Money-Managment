@@ -61,7 +61,7 @@ export default function Reports() {
   console.log(
     `Reports - Filtering for ${year}-${String(month).padStart(2, "0")}:`,
     filteredTransactions.length,
-    "transactions"
+    "transactions",
   );
 
   const monthlyIncome = filteredTransactions
@@ -110,7 +110,7 @@ export default function Reports() {
     doc.text(
       "Net Savings: " + formatAmount(monthlyIncome - monthlyExpense),
       14,
-      69
+      69,
     );
     doc.text("Number of Transactions: " + dataToExport.length, 14, 76);
 
@@ -190,7 +190,7 @@ export default function Reports() {
     ]);
 
     const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join(
-      "\n"
+      "\n",
     );
 
     const blob = new Blob([csv], { type: "text/csv" });
@@ -199,7 +199,7 @@ export default function Reports() {
     link.href = url;
     link.download = `financial-report-${year}-${String(month).padStart(
       2,
-      "0"
+      "0",
     )}.csv`;
     link.click();
   };
@@ -230,7 +230,7 @@ export default function Reports() {
     link.href = url;
     link.download = `financial-report-${year}-${String(month).padStart(
       2,
-      "0"
+      "0",
     )}.json`;
     link.click();
   };
@@ -238,14 +238,14 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-8 shadow-xl text-white">
+      <div className="page-hero">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-              <FileText className="h-10 w-10" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2 sm:gap-3 text-gray-900 dark:text-gray-100">
+              <FileText className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 text-gray-700 dark:text-gray-300" />
               Financial Reports
             </h1>
-            <p className="text-indigo-100 text-lg">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400">
               Generate and export comprehensive financial reports
             </p>
           </div>
@@ -254,7 +254,7 @@ export default function Reports() {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Report Type
@@ -298,7 +298,7 @@ export default function Reports() {
             >
               {Array.from(
                 { length: new Date().getFullYear() - 2020 + 2 },
-                (_, i) => new Date().getFullYear() + 1 - i
+                (_, i) => new Date().getFullYear() + 1 - i,
               ).map((y) => (
                 <option key={y} value={y}>
                   {y}
@@ -331,7 +331,7 @@ export default function Reports() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-200 dark:border-green-700">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -341,7 +341,7 @@ export default function Reports() {
               <TrendingUp className="h-6 w-6 text-white" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+          <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 break-words">
             ₹{monthlyIncome.toLocaleString()}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -359,7 +359,7 @@ export default function Reports() {
               <DollarSign className="h-6 w-6 text-white" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+          <p className="text-2xl sm:text-3xl font-bold text-red-600 dark:text-red-400 break-words">
             ₹{monthlyExpense.toLocaleString()}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -377,7 +377,7 @@ export default function Reports() {
               <PieChart className="h-6 w-6 text-white" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+          <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 break-words">
             ₹{(monthlyIncome - monthlyExpense).toLocaleString()}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -393,13 +393,13 @@ export default function Reports() {
 
       {/* Detailed Transactions Table */}
       <div className="card">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
             Transaction Details
           </h3>
           <button
             onClick={generatePDFReport}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2"
           >
             <Download className="h-4 w-4" />
             Download PDF
@@ -457,7 +457,7 @@ export default function Reports() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {new Date(
-                        transaction.transactionDate
+                        transaction.transactionDate,
                       ).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">

@@ -11,6 +11,7 @@ export default function StatCard({
     danger: "from-red-500 to-red-600",
     warning: "from-yellow-500 to-yellow-600",
     purple: "from-purple-500 to-purple-600",
+    black: "from-gray-800 to-gray-900",
   };
 
   return (

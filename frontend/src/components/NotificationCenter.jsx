@@ -40,7 +40,7 @@ export default function NotificationCenter() {
         const dueDate = new Date(bill.nextDueDate);
         const today = new Date();
         const daysUntilDue = Math.ceil(
-          (dueDate - today) / (1000 * 60 * 60 * 24)
+          (dueDate - today) / (1000 * 60 * 60 * 24),
         );
         const isUrgent = daysUntilDue <= 1;
 
@@ -54,15 +54,15 @@ export default function NotificationCenter() {
             daysUntilDue === 0
               ? "today"
               : daysUntilDue === 1
-              ? "tomorrow"
-              : `in ${daysUntilDue} days`
+                ? "tomorrow"
+                : `in ${daysUntilDue} days`
           }`,
           time:
             daysUntilDue === 0
               ? "Today"
               : daysUntilDue === 1
-              ? "Tomorrow"
-              : `${daysUntilDue} days`,
+                ? "Tomorrow"
+                : `${daysUntilDue} days`,
           read: false,
           icon: AlertTriangle,
           color: isUrgent ? "red" : "orange",
@@ -83,7 +83,7 @@ export default function NotificationCenter() {
             message: `${
               budget.category
             } expenses exceeded your budget by ₹${Math.abs(
-              budget.amount - spentAmount
+              budget.amount - spentAmount,
             ).toLocaleString()}`,
             time: "Recently",
             read: false,
@@ -132,7 +132,7 @@ export default function NotificationCenter() {
 
   const markAsRead = (id) => {
     setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
+      notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   };
 
@@ -181,7 +181,7 @@ export default function NotificationCenter() {
           ></div>
 
           {/* Panel */}
-          <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl z-50 border-2 border-gray-200 dark:border-gray-700 max-h-[600px] flex flex-col">
+          <div className="fixed top-20 left-2 right-2 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-2 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl z-50 border-2 border-gray-200 dark:border-gray-700 max-h-[75vh] sm:max-h-[600px] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-2xl">
               <div className="flex items-center gap-2 text-white">
@@ -236,7 +236,7 @@ export default function NotificationCenter() {
                         {/* Icon */}
                         <div
                           className={`p-2 rounded-xl h-fit ${getColorClasses(
-                            notification.color
+                            notification.color,
                           )}`}
                         >
                           <Icon className="h-5 w-5" />

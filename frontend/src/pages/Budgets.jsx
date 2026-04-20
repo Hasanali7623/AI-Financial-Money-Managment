@@ -65,7 +65,7 @@ export default function Budgets() {
         console.error("Error deleting budget:", error);
         alert(
           error.response?.data?.message ||
-            "Failed to delete budget. Please try again."
+            "Failed to delete budget. Please try again.",
         );
       }
     }
@@ -115,21 +115,21 @@ export default function Budgets() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-8 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="text-white">
-            <h1 className="text-4xl font-bold mb-2 flex items-center">
-              <Wallet className="h-10 w-10 mr-3" />
+      {/* Header */}
+      <div className="page-hero">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center text-gray-900 dark:text-gray-100">
+              <Wallet className="h-7 w-7 sm:h-8 sm:w-8 mr-3 text-gray-700 dark:text-gray-300" />
               Budget Manager
             </h1>
-            <p className="text-indigo-100 text-lg">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Control your spending with smart budget tracking
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-white text-purple-600 hover:bg-purple-50 px-6 py-3 rounded-xl font-semibold flex items-center shadow-lg transition-all hover:scale-105"
+            className="btn-primary w-full sm:w-auto"
           >
             <Plus className="h-5 w-5 mr-2" />
             Create Budget
@@ -153,8 +153,8 @@ export default function Budgets() {
                 isOverBudget
                   ? "bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 border-red-300 dark:border-red-700"
                   : isWarning
-                  ? "bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-yellow-300 dark:border-yellow-700"
-                  : "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-green-300 dark:border-green-700"
+                    ? "bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-yellow-300 dark:border-yellow-700"
+                    : "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-green-300 dark:border-green-700"
               }`}
             >
               {/* Status Badge */}
@@ -186,7 +186,7 @@ export default function Budgets() {
                   📅{" "}
                   {new Date(budget.year, budget.month - 1).toLocaleDateString(
                     "default",
-                    { month: "long", year: "numeric" }
+                    { month: "long", year: "numeric" },
                   )}
                 </span>
               </div>
@@ -236,8 +236,8 @@ export default function Budgets() {
                       isOverBudget
                         ? "text-red-600 dark:text-red-400"
                         : isWarning
-                        ? "text-yellow-600 dark:text-yellow-400"
-                        : "text-green-600 dark:text-green-400"
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-green-600 dark:text-green-400"
                     }`}
                   >
                     {percentage.toFixed(1)}%
@@ -249,8 +249,8 @@ export default function Budgets() {
                       isOverBudget
                         ? "bg-gradient-to-r from-red-500 to-red-600"
                         : isWarning
-                        ? "bg-gradient-to-r from-yellow-500 to-amber-500"
-                        : "bg-gradient-to-r from-green-500 to-emerald-500"
+                          ? "bg-gradient-to-r from-yellow-500 to-amber-500"
+                          : "bg-gradient-to-r from-green-500 to-emerald-500"
                     }`}
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                   >
